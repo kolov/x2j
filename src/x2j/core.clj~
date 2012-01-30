@@ -1,0 +1,26 @@
+(ns jx.core
+  (:use [cheshire.core :as j]
+        [clojure.xml :as x]
+        )
+  )
+
+(def TST "<a attr1=\"val1\" attr2=\"val2\" ><b1 bb=\"bbX\">b1</b1><b2 bb=\"bb\">b2</b2></a>")
+
+(defn xml-parse-string [#^java.lang.String x]
+  (x/parse (java.io.ByteArrayInputStream. (.getBytes x))))
+
+(defn t [] (xml-parse-string TST))
+
+(defn keyword+@ [kw] ((keyword str "@" (subs (str kw) 1))))
+(defn attrs-names "Converts attributes map to json format, i.e. prepends @ to attribute name"
+  [m] (zipmap (map keyword+@ (keys m)) (vals m)))
+
+(defn xj [{tag :tag attrs :attrs contenct :content}]
+  (hash-map tag
+          (if attrs (attrs-names attrs))
+          ))
+
+(defn see [x] (println (xj (xml-parse-string x))))
+  
+(defn j [] (println (j/generate-string (xj (t)))))
+

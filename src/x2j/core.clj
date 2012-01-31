@@ -22,8 +22,9 @@
                  )))
   
 (defn build-content [{ attrs :attrs content :content}]                           
- (if (and (nil? attrs) (nil? content)) nil             
-  (build-content-seq  attrs content)))
+  (cond (and (nil? attrs) (nil? content)) nil
+        (and (nil? attrs) (not (map? (first content)))) (first content)
+  :else (build-content-seq  attrs content)))
 
 (defn build-node [node] (hash-map (:tag node) (build-content node))) 
 

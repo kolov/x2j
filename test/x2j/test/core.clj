@@ -6,8 +6,10 @@
 (defn dehyd [^String s] (replace (replace s " " "") "\"" "'"))
 
 (defn === [a b] "Compare ignoring whitespace. \" is same as '"
-  (= (dehyd a) (dehyd b)))
+  (do (println "Compare:") (println a) (println b) (= (dehyd a) (dehyd b))))
 
+
+      
 (deftest eq1
   (is (=== "a" "a "))
   (is (=== "a" " a"))
@@ -28,3 +30,5 @@
 
 (test-j-x a1 [ "{ 'a':null}", "<a/>"])
 (test-j-x a2 [ "{ 'a':'x'}", "<a>x</a>"])
+(test-j-x t3 [ "{'a':{'@attr1':'attrval1'}}", "<a attr1=\"attrval1\"/>"])
+(test-j-x t4 [ "{'a':{'b':'c'}}" , "<a><b>c</b></a>"])

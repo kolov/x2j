@@ -22,15 +22,16 @@
 (defn contentMap? [content] (map? (first content)))
 (defn build-content-seq   [attrs content]   
   (merge  (if attrs (decorate-attrs attrs) {})
-          (cond  (map? (first content))
-                 (reduce merge-to-vector (map build-node content))
-                 (nil? content) {}
+          (cond  (contentMap? content)
+                    (reduce merge-to-vector (map build-node content))
+                    (nil? content)
+                    {}
                  :else (hash-map  "#text" (first content))
                  )))
   
 (defn build-content [{ attrs :attrs content :content}]                           
   (cond (and (nil? attrs) (nil? content)) nil
-        (and (nil? attrs) (not (map? (first content)))) (first content)
+        (and (nil? attrs) (not (contentMap? content))) (first content)
   :else (build-content-seq  attrs content)))
 
 (defn build-node [node] (hash-map (:tag node) (build-content node))) 

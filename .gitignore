@@ -1,0 +1,5 @@
+lib
+classes
+.lein*
+*.jar
+pom.xml

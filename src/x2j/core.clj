@@ -14,18 +14,20 @@
 
 (defn decorate-kwd "attach @ at the beginning of a keyword"
   [kw] (keyword (str "@" (subs (str kw) 1))))
-(defn decorate-attrs " prepends @ to keys in a map("
+(defn decorate-attrs "prepends @ to keys in a map"
   [m] (zipmap (map decorate-kwd (keys m)) (vals m)))
 
 (defn to-vec [x]  (if (vector? x) x (vector x)))
-(defn merge-to-vector [m1 m2] (merge-with #(into (to-vec %1) (to-vec %2)) m1 m2))
-(defn contentMap? [content] (map? (first content)))
+(defn merge-to-vector "merge 2 maps, putting values of repeating keys in a vector"
+   [m1 m2] (merge-with #(into (to-vec %1) (to-vec %2)) m1 m2))
+(defn contentMap? "Check if a node contand is a map i.e. has child nodes"
+   [content] (map? (first content)))
+                         
 (defn build-content-seq   [attrs content]   
   (merge  (if attrs (decorate-attrs attrs) {})
           (cond  (contentMap? content)
                     (reduce merge-to-vector (map build-node content))
-                    (nil? content)
-                    {}
+                 (nil? content) {}
                  :else (hash-map  "#text" (first content))
                  )))
   

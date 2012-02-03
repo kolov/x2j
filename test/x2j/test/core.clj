@@ -8,7 +8,7 @@
 
 
 (defn === [js x] (let [converted (j/parse-string x)]
-                   (do (println converted "--" js)
+                   (do (println converted "<-comparing->" js)
                        (= (j/parse-string js) converted))))
       
 (defmacro test-j-x
@@ -32,3 +32,15 @@
 
 (test-j-x case5 [ "{\"e\": { \"a\": [ \"text\",  \"text\"] }}"
                   "<e> <a>text</a> <a>text</a> </e>"])
+(test-j-x person [ (str "{ \"person\" : {"
+                        " \"hobbies\" : { \"hobby\" : [\"books\", \"tv\"]}, "
+                        " \"id\" : {\"#text\" : \"34234234324\", \"@type\" : \"passport\"}, "
+                        " \"address\" : {\"street\": \"Main Street\", \"city\" : \"Atlanta\"}, "
+                        "\"name\" : \"Joe\"}}")
+                   
+                   (str "<person>"
+                   "<name>Joe</name>"
+                    "<address><street>Main Street</street><city>Atlanta</city></address>"
+                    "<id type=\"passport\">34234234324</id>"
+                    "<hobbies><hobby>books</hobby><hobby>tv</hobby></hobbies>"
+                    "</person>")])

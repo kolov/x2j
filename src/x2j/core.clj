@@ -22,25 +22,32 @@
    [m1 m2] (merge-with #(into (to-vec %1) (to-vec %2)) m1 m2))
 (defn contentMap? "Check if a node contand is a map i.e. has child nodes"
    [content] (map? (first content)))
-                         
-(defn build-content-seq   [attrs content]   
-  (merge  (if attrs (decorate-attrs attrs) {})
-          (cond  (contentMap? content)
-                    (reduce merge-to-vector (map build-node content))
-                 (nil? content) {}
-                 :else (hash-map  "#text" (first content))
-                 )))
-  
-(defn build-content [{ attrs :attrs content :content}]                           
-  (cond (and (nil? attrs) (nil? content)) nil
-        (and (nil? attrs) (not (contentMap? content))) (first content)
-  :else (build-content-seq  attrs content)))
 
-(defn build-node [node] (hash-map (:tag node) (build-content node))) 
+(defn parts [{ attrs :attrs content :content}]
+  (merge (decorate-attrs attrs)
+        (cond (contentMap? content) (reduce merge-to-vector (map build-node content))
+              (nil? content) nil
+              :else (hash-map  "#text" (first content)))
+        ))
+(defn check-text-only [m] (if (= (keys m) '("#text")) (val (first m)) m))
+(defn check-empty  [m] (if (empty? m) nil m))
+
+(defn build-node [node] (hash-map (:tag node) (check-empty (check-text-only (parts node)))))
 
 (defn x2j [x] (j/generate-string (build-node (xml-parse-string x))))
 
 (defn -x2j [x] (x2j x))
-(defn see [x] (println (x2j x)))
+
+; Developing jx2 below, not finished
+
+(def J "{ \"_id\" : { \"$oid\" : \"4f2aed38036422710e1ce932\"} , \"person\" : { \"hobbies\" : {\"hobby\" : [ \"books\" , \"tv\"]} , \"id\" : { \"#text\" : \"34234234324\" , \"@type\" : \"passport\"} , \"address\" : { \"street\" : \"Main Street\" , \"city\" : \"Atlanta\"} , \"name\" : \"Joe\"}}")
 
 
+(defn isAttr [name] (.startsWith name "@"))
+(defn isText [name] (.startsWith name "#"))
+(defn isSubnode [name] (and (not (isAttr name)) (not (isText name )))) 
+(defn make-attrs [node] nil)
+(defn make-content [node] ( map #( {%1 (node %1)}) (filter isSubnode (keys node))))
+(defn make-node [node name]  { :tag name :attrs (make-attrs node) :content (make-content node)})
+(defn node2x [node name] (let [subnode (node name)](make-node subnode name)))
+(defn j2x [s name] (  node2x (j/parse-string s) name))

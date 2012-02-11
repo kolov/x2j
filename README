@@ -1,2 +1,15 @@
-XML 2 JSON conversion as part of learning closure.
-Used rules at http://www.xml.com/pub/a/2006/05/31/converting-between-xml-and-json.html
+XML 2 JSON conversion in Clojure.
+
+This is my first clojure project.
+
+Some conventions are needed for this conversion. The rules I found at 
+http://www.xml.com/pub/a/2006/05/31/converting-between-xml-and-json.html 
+make sens, except the last one. I copied the rules here:
+
+1. <e/>  "e": null	o.e
+2	<e>text</e>	"e": "text"	o.e
+3	<e name="value" />	"e":{"@name": "value"}	o.e["@name"]
+4	<e name="value">text</e>	"e": { "@name": "value", "#text": "text" }	o.e["@name"] o.e["#text"]
+5	<e> <a>text</a> <b>text</b> </e>	"e": { "a": "text", "b": "text" }	o.e.a o.e.b
+6	<e> <a>text</a> <a>text</a> </e>	"e": { "a": ["text", "text"] }	o.e.a[0] o.e.a[1]
+7	<e> text <a>text</a> </e>	"e": { "#text": "text", "a": "text" }

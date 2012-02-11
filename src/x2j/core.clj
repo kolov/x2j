@@ -32,7 +32,7 @@
 (defn check-text-only [m] (if (= (keys m) '("#text")) (val (first m)) m))
 (defn check-empty  [m] (if (empty? m) nil m))
 
-(defn build-node [node] (hash-map (:tag node) (check-empty (check-text-only (parts node)))))
+(defn build-node [node] (hash-map (:tag node) (-> (parts node) check-empty check-text-only)))
 
 (defn x2j [x] (j/generate-string (build-node (xml-parse-string x))))
 
@@ -42,14 +42,15 @@
 
 (def J "{ \"_id\" : { \"$oid\" : \"4f2aed38036422710e1ce932\"} , \"person\" : { \"hobbies\" : {\"hobby\" : [ \"books\" , \"tv\"]} , \"id\" : { \"#text\" : \"34234234324\" , \"@type\" : \"passport\"} , \"address\" : { \"street\" : \"Main Street\" , \"city\" : \"Atlanta\"} , \"name\" : \"Joe\"}}")
 
-
+(declare node2x)
 (defn isAttr [name] (.startsWith name "@"))
 (defn isText [name] (.startsWith name "#"))
 (defn isSubnode [name] (and (not (isAttr name)) (not (isText name )))) 
 (defn make-attrs [node] ( map #( hash-map %1 (node %1)) (filter isAttr (keys node))))
-(defn make-content-map [node] ( map #( hash-map %1 (node %1)) (filter isSubnode (keys node))))
-(defn make-content [v] ( if (map? v) (make-content-map v) v))
+(defn make-content-map [node] ( map #(do (println "subnode: [" (find node % )"]") ) (filter isSubnode (keys node))))
+(defn make-content [v] ( if (map? v) (make-content-map v) v) )
                        
-(defn node2x [m] (let [ f (first m) k (key f) v (val f)] {:tag k :attrs (make-attrs v) :content (make-content v)}))
-(defn j2x ( [s name] ( node2x { name ((j/parse-string s) name) }))
+(defn node2x [me] (let [ k (key me) v (val me)]
+                   {:tag k :attrs (make-attrs v) :content (make-content v)}))
+(defn j2x ( [s name] ( node2x ( find (j/parse-string s) name)))
           ( [s] (node2x (j/parse-string s))))

@@ -45,12 +45,25 @@
 (declare node2x)
 (defn isAttr [name] (.startsWith name "@"))
 (defn isText [name] (.startsWith name "#"))
-(defn isSubnode [name] (and (not (isAttr name)) (not (isText name )))) 
-(defn make-attrs [node] ( map #( hash-map %1 (node %1)) (filter isAttr (keys node))))
-(defn make-content-map [node] ( map #(do (println "subnode: [" (find node % )"]") ) (filter isSubnode (keys node))))
-(defn make-content [v] ( if (map? v) (make-content-map v) v) )
-                       
+(defn isSubnode [name] (and (not (isAttr name)) (not (isText name ))))
+(defn make-attrs [v] (->
+                      (if (map? v)
+                        (reduce
+                         merge
+                         (map #( hash-map % (v %)) (filter isAttr (keys v))))
+                        nil)
+                      check-empty ))
+                        
+(defn make-content-map [v]  (vec (flatten (map #(node2x  (find v % )) (filter isSubnode (keys v))))))
+(defn make-content [v] ( ->
+                         (if (map? v) (make-content-map v) (to-vec v))
+                         check-empty))
+
+(defn make-xml-node [k v] {:tag k :attrs (make-attrs v) :content (make-content v)})
 (defn node2x [me] (let [ k (key me) v (val me)]
-                   {:tag k :attrs (make-attrs v) :content (make-content v)}))
+                    (if (vector? v)
+                       (vec (map #(make-xml-node k %) v))
+                      (make-xml-node k v))))
+
 (defn j2x ( [s name] ( node2x ( find (j/parse-string s) name)))
           ( [s] (node2x (j/parse-string s))))

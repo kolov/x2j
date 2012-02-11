@@ -2,6 +2,7 @@
   (:use [cheshire.core :as j]
         [clojure.xml :as x]
         )
+  (:require [clojure.string])
   (:gen-class
    :name net.kolov.x2j.Converter
    :methods [
@@ -80,6 +81,7 @@
   ([s] (let [parsed (j/parse-string s)] (parsed2x parsed)))
   ([s name] (let [parsed (j/parse-string s)] (parsed2x parsed name))))
 
+(defn emit-xml [x] (clojure.string/replace (with-out-str (x/emit x)) "\n" ""))
 (defn -j2x
-  ([#^java.lang.String s] (clojure.xml/emit (j2x s)))
-  ([#^java.lang.String s #^java.lang.String name] (clojure.xml/emit (j2x s name))))
+  ([#^java.lang.String s] (emit-xml (j2x s)))
+  ([#^java.lang.String s #^java.lang.String name] (emit-xml (j2x s name))))

@@ -4,7 +4,12 @@
         )
   (:gen-class
    :name net.kolov.x2j.Converter
-       :methods [#^{:static true} [x2j [java.lang.String] java.lang.String]])
+   :methods [
+             #^{:static true} [x2j [java.lang.String] java.lang.String]
+             #^{:static true} [j2x [java.lang.String] java.lang.String]
+             #^{:static true} [j2x [java.lang.String java.lang.String] java.lang.String]
+             ])
+              
 )
 
 (defn xml-parse-string [#^java.lang.String x]
@@ -35,12 +40,8 @@
 (defn build-node [node] (hash-map (:tag node) (-> (parts node) check-empty check-text-only)))
 
 (defn x2j [x] (j/generate-string (build-node (xml-parse-string x))))
-
 (defn -x2j [x] (x2j x))
-
-; Developing jx2 below, not finished
-
-(def J "{ \"_id\" : { \"$oid\" : \"4f2aed38036422710e1ce932\"} , \"person\" : { \"hobbies\" : {\"hobby\" : [ \"books\" , \"tv\"]} , \"id\" : { \"#text\" : \"34234234324\" , \"@type\" : \"passport\"} , \"address\" : { \"street\" : \"Main Street\" , \"city\" : \"Atlanta\"} , \"name\" : \"Joe\"}}")
+; Start JSON 2 XML 
 
 (declare node2x)
 (defn isAttr [name] (.startsWith name "@"))
@@ -54,8 +55,9 @@
                         nil)
                       check-empty ))
                         
-(defn make-content-map [v]  (vec (flatten (map #(node2x  (find v % )) (filter isSubnode (keys v))))))
-(defn make-content [v] ( ->
+(defn make-content-map [v]  (vec (flatten
+                                  (map #(node2x  (find v % )) (filter isSubnode (keys v))))))
+(defn make-content [v] (->
                          (if (map? v) (make-content-map v) (to-vec v))
                          check-empty))
 
@@ -64,6 +66,20 @@
                     (if (vector? v)
                        (vec (map #(make-xml-node k %) v))
                       (make-xml-node k v))))
+(defn parsed2x
+  ([m name]  (let [ me (find m name)]
+               (if (nil? me)
+                 (throw (IllegalArgumentException. (str "No such element: " name))))
+               (node2x me)))
+                                                                
+  ( [m] (if (= (count m) 1)
+          (node2x (first m))
+          (throw (IllegalArgumentException. "More than 1 entry, specyfy name")))))
 
-(defn j2x ( [s name] ( node2x ( find (j/parse-string s) name)))
-          ( [s] (node2x (j/parse-string s))))
+(defn j2x 
+  ([s] (let [parsed (j/parse-string s)] (parsed2x parsed)))
+  ([s name] (let [parsed (j/parse-string s)] (parsed2x parsed name))))
+
+(defn -j2x
+  ([#^java.lang.String s] (clojure.xml/emit (j2x s)))
+  ([#^java.lang.String s #^java.lang.String name] (clojure.xml/emit (j2x s name))))

@@ -1,6 +1,8 @@
-XML 2 JSON conversion in Clojure. A Java-usable jar is available.
+XML <--> JSON conversion in Clojure. Generates a class usable from Java.
 
-This is my first clojure project. I was curious to try storing and searching XML documents in  a Json database. 
+This is my first clojure project. I am impressed with the compactness of the code.
+
+I was curious to try storing and searching XML documents in  a Json database. 
 MongoDB, as well as other NoSQL databases, are comfortable with Json while not supporting XML at all. 
 A well-defined conversion 
 between XML and Json would turn any Json database to XML database.
@@ -15,7 +17,7 @@ make sense, except the last one. I copied the rules here:
     4.	<e name="value">text</e>	   <--->  "e"  : { "@name": "value", "#text": "text" }	
     5.	<e> <a>text</a> <b>text</b> </e>	<---> "e" : { "a": "text", "b": "text" }	
     6.	<e> <a>text</a> <a>text</a> </e>	<---> "e": { "a": ["text", "text"] }	
-    7.	<e> text <a>text</a> </e>	"e" <---???---> { "#text": "text", "a": "text" }
+    7.	<e> text <a>text</a> </e>	      <---???---> "e" : { "#text": "text", "a": "text" }
 
 As an example, the following:
     <person>

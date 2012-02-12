@@ -1,6 +1,6 @@
 XML <--> JSON conversion in Clojure. Generates a class usable from Java.
 
-This is my first clojure project. I am impressed with the compactness of the code.
+This is my first clojure project.
 
 I was curious to try storing and searching XML documents in  a Json database. 
 MongoDB, as well as other NoSQL databases, are comfortable with Json while not supporting XML at all. 
@@ -20,6 +20,7 @@ make sense, except the last one. I copied the rules here:
     7.	<e> text <a>text</a> </e>	      <---???---> "e" : { "#text": "text", "a": "text" }
 
 As an example, the following:
+
     <person>
      <name>Joe</name>
      <address>
@@ -32,6 +33,7 @@ As an example, the following:
       <hobby>tv</hobby>
      </hobbies>
     </person>
+    
 Becomes:
 
     {"person": {"hobbies":
@@ -50,5 +52,6 @@ The Clojure code is self-explajing. The Java class supports the following two me
     public static String j2x(String jsonContainingManyElements, String elementName)
 
 I still have to figure out how to make the jar available.
-
+A finale note: I am new to Clojure and the code can certainly be improved a lot, but I am impressed 
+with the compactness of the result.
 

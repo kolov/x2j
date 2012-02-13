@@ -9,7 +9,7 @@ between XML and Json would turn any Json database to XML database.
 
 Some conventions are needed for this conversion. The rules I found at 
 http://www.xml.com/pub/a/2006/05/31/converting-between-xml-and-json.html 
-make sense, except the last one. I copied the rules here:
+make perfect sense to me, except #7 dealing with mixed content. Here's a copy of the rules:
  
     1. <e/>                        <--->  "e" : null
     2.	<e>text</e>	                <--->  "e" : "text"	
@@ -44,8 +44,7 @@ Becomes:
 
 
 I've written some tests for each rule, see test/core.clj. Basic tests run OK, no extensive testing has taken place yet. Use at your own risk.
-
-The Clojure code is self-explajing. The Java class supports the following two methods:
+The Clojure code is self-explaining. The Java class supports the following two methods:
   
     public static String x2j(String xml)
     public static String j2x(String jsonContainingOneElement)

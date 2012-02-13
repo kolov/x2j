@@ -51,7 +51,7 @@ The Clojure code is self-explajing. The Java class supports the following two me
     public static String j2x(String jsonContainingOneElement)
     public static String j2x(String jsonContainingManyElements, String elementName)
 
-I still have to figure out how to make the jar available.
-A finale note: I am new to Clojure and the code can certainly be improved a lot, but I am impressed 
-with the compactness of the result.
+I used this converter to store and query XML in MongoDB, see a blog entry about it [here](http://assenkolov.blogspot.com/2012/02/storing-xml-in-json-database.html). I still have to make the jar available.
+A final note: I am new to Clojure and the code can certainly be improved a lot, but I am impressed 
+with the compactness of the result. 
 
